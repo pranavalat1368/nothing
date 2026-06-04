@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bella Cucina — 3D Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --red:#8B0000;--gold:#C9A84C;--gold2:#E8C97A;
+  --cream:#F7F0E3;--dark:#0a0806;--dark2:#1a1410;
+  --muted:#7a6e62;
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--dark);
+  color:white;
+  overflow-x:hidden;
+}
+
+/* CANVAS */
+#bg-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  padding:1.4rem 5%;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(10,8,6,0);
+  backdrop-filter:blur(0px);
+  transition:all 0.5s ease;
+}
+nav.solid{
+  background:rgba(10,8,6,0.92);
+  backdrop-filter:blur(16px);
+  padding:0.9rem 5%;
+  border-bottom:1px solid rgba(201,168,76,0.15);
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;font-style:italic;font-weight:600;
+  color:var(--gold);letter-spacing:1px;
+}
+.nav-links{display:flex;list-style:none;gap:2rem;}
+.nav-links a{
+  color:rgba(255,255,255,0.8);text-decoration:none;
+  font-size:0.72rem;letter-spacing:2.5px;text-transform:uppercase;
+  transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--gold);}
+.menu-toggle{display:none;background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;}
+
+/* SECTIONS */
+section{position:relative;z-index:1;}
+
+/* HERO */
+#hero{
+  height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+}
+.hero-inner{position:relative;z-index:2;}
+.hero-tag{
+  display:inline-block;
+  font-size:0.68rem;letter-spacing:5px;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(201,168,76,0.4);
+  padding:0.45rem 1.4rem;margin-bottom:2rem;
+  animation:fadeUp 1.2s ease both;
+}
+#hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(4rem,10vw,9rem);
+  font-style:italic;font-weight:300;
+  line-height:0.95;
+  background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.6) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:fadeUp 1.2s ease 0.2s both;
+}
+#hero p{
+  font-size:0.85rem;letter-spacing:5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.5);margin:1.5rem 0 2.5rem;
+  animation:fadeUp 1.2s ease 0.4s both;
+}
+.hero-btns{animation:fadeUp 1.2s ease 0.6s both;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn{
+  display:inline-block;padding:0.9rem 2.4rem;
+  font-family:'Jost',sans-serif;
+  font-size:0.72rem;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:all 0.35s ease;
+}
+.btn-gold{background:var(--gold);color:#0a0806;}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-3px);box-shadow:0 12px 30px rgba(201,168,76,0.35);}
+.btn-ghost{background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:0.5rem;
+  color:rgba(255,255,255,0.35);font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;
+  animation:fadeUp 1.2s ease 1s both;
+}
+.scroll-line{
+  width:1px;height:50px;background:linear-gradient(to bottom,var(--gold),transparent);
+  animation:scrollLine 1.5s ease-in-out infinite;
+}
+@keyframes scrollLine{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform:scaleY(1);transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+
+/* STORY SECTION */
+#story{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:0;
+  padding:0;
+}
+.story-text-side{
+  padding:8rem 5rem 8rem 8%;
+  position:relative;z-index:2;
+}
+.story-canvas-side{
+  height:100vh;position:sticky;top:0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#dish-canvas{width:100%;height:100%;display:block;}
+
+.label{
+  font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1rem;display:block;
+}
+.story-text-side h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.2rem,3.5vw,3.2rem);
+  font-style:italic;font-weight:300;
+  color:white;line-height:1.2;margin-bottom:1.5rem;
+}
+.story-text-side p{
+  color:rgba(255,255,255,0.55);
+  line-height:1.9;font-size:0.95rem;margin-bottom:1.2rem;
+}
+.stats{display:flex;gap:2.5rem;margin-top:2.5rem;}
+.stat span{
+  display:block;
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:600;color:var(--gold);line-height:1;
+}
+.stat p{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-top:0.3rem;}
+
+/* MENU */
+#menu{
+  padding:7rem 5%;
+  background:linear-gradient(180deg,var(--dark) 0%,#120d09 100%);
+}
+#menu .sec-head{text-align:center;margin-bottom:4rem;}
+#menu h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3.5rem);
+  font-style:italic;font-weight:300;color:white;margin-bottom:0.5rem;
+}
+.gold-line{width:50px;height:1px;background:var(--gold);margin:1.2rem auto;}
+
+.menu-tabs{display:flex;justify-content:center;gap:0.5rem;margin-bottom:3rem;flex-wrap:wrap;}
+.tab{
+  padding:0.5rem 1.5rem;
+  font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;
+  background:transparent;border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.3s;
+}
+.tab.on,.tab:hover{background:var(--red);border-color:var(--red);color:white;}
+
+.menu-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:1.5rem;max-width:1100px;margin:0 auto;
+}
+.mcard{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  padding:1.8rem;
+  transition:all 0.4s ease;
+  position:relative;overflow:hidden;
+}
+.mcard::before{
+  content:'';position:absolute;bottom:0;left:0;width:0;height:2px;
+  background:var(--gold);transition:width 0.4s ease;
+}
+.mcard:hover{background:rgba(255,255,255,0.07);transform:translateY(-5px);}
+.mcard:hover::before{width:100%;}
+.mcard-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.6rem;}
+.mcard h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;color:white;}
+.price{color:var(--gold);font-size:1rem;}
+.mcard p{color:rgba(255,255,255,0.45);font-size:0.86rem;line-height:1.7;}
+.mtag{
+  display:inline-block;margin-top:0.8rem;
+  font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(201,168,76,0.3);padding:0.2rem 0.6rem;
+}
+
+/* EXPERIENCE STRIP */
+#experience{
+  padding:6rem 5%;
+  background:var(--dark2);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:0;
+}
+.exp-item{
+  padding:3.5rem 3rem;
+  border-left:1px solid rgba(255,255,255,0.06);
+  transition:background 0.3s;
+}
+.exp-item:hover{background:rgba(255,255,255,0.03);}
+.exp-icon{font-size:2.2rem;margin-bottom:1.2rem;}
+.exp-item h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;font-style:italic;color:var(--gold);margin-bottom:0.7rem;
+}
+.exp-item p{color:rgba(255,255,255,0.45);font-size:0.88rem;line-height:1.7;}
+
+/* RESERVATION */
+#reservation{
+  padding:7rem 5%;
+  background:linear-gradient(135deg,rgba(80,10,10,0.6) 0%,rgba(10,8,6,0.9) 100%);
+  position:relative;overflow:hidden;
+}
+#reservation::before{
+  content:'';position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=1920&q=60') center/cover;
+  opacity:0.07;z-index:0;
+}
+.res-inner{position:relative;z-index:1;max-width:640px;margin:0 auto;text-align:center;}
+.res-inner h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,4vw,3rem);font-style:italic;font-weight:300;
+  color:white;margin-bottom:0.5rem;
+}
+.res-form{
+  margin-top:2.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;
+  text-align:left;
+}
+.res-form input,.res-form select,.res-form textarea{
+  width:100%;padding:1rem 1.2rem;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(201,168,76,0.2);
+  color:white;font-family:'Jost',sans-serif;font-size:0.9rem;
+  outline:none;transition:border 0.3s;
+}
+.res-form input:focus,.res-form select:focus,.res-form textarea:focus{border-color:var(--gold);}
+.res-form input::placeholder,.res-form textarea::placeholder{color:rgba(255,255,255,0.3);}
+.res-form select{color:rgba(255,255,255,0.5);}
+.res-form select option{background:var(--dark2);}
+.full{grid-column:span 2;}
+.wa-note{margin-top:1rem;font-size:0.8rem;color:rgba(255,255,255,0.35);}
+.wa-note a{color:var(--gold);text-decoration:none;}
+
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--dark);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.8s ease, visibility 0.8s ease;
+}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.loader-content{text-align:center;}
+.loader-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-style:italic;color:var(--gold);
+  margin-bottom:2rem;letter-spacing:2px;
+}
+.loader-bar{
+  width:240px;height:1px;background:rgba(255,255,255,0.1);
+  overflow:hidden;margin:0 auto 1rem;
+}
+.loader-fill{
+  height:100%;width:0;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  animation:loadFill 2.5s ease forwards;
+}
+@keyframes loadFill{to{width:100%;}}
+.loader-text{
+  color:rgba(255,255,255,0.4);
+  font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;
+}
+
+.audio-toggle{
+  position:fixed;bottom:2rem;left:2rem;z-index:200;
+  width:54px;height:54px;border-radius:50%;
+  background:rgba(201,168,76,0.15);
+  border:1px solid rgba(201,168,76,0.3);
+  backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.3rem;
+  transition:all 0.3s;
+}
+.audio-toggle:hover{
+  background:rgba(201,168,76,0.3);
+  transform:scale(1.1);
+}
+
+.mcard{
+  transform-style:preserve-3d;
+  transition:transform 0.4s ease, box-shadow 0.4s ease;
+}
+.mcard.tilt:hover{
+  box-shadow:0 20px 40px rgba(0,0,0,0.4);
+}
+
+#steam-canvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:1;pointer-events:none;mix-blend-mode:screen;
+}
+
+/* FOOTER */
+footer{
+  background:var(--dark);
+  border-top:1px solid rgba(255,255,255,0.05);
+  padding:3rem 5%;
+  display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1.5rem;
+}
+.foot-logo{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-style:italic;color:var(--gold);}
+.foot-links{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.foot-links a{color:rgba(255,255,255,0.35);text-decoration:none;font-size:0.75rem;letter-spacing:1px;transition:color 0.3s;}
+.foot-links a:hover{color:var(--gold);}
+footer p{color:rgba(255,255,255,0.2);font-size:0.75rem;}
+
+/* WA FLOAT */
+.wa-float{
+  position:fixed;bottom:2rem;right:2rem;z-index:200;
+  width:54px;height:54px;border-radius:50%;
+  background:#25D366;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;text-decoration:none;
+  box-shadow:0 4px 20px rgba(37,211,102,0.4);
+  animation:waPulse 2.5s infinite;
+  transition:transform 0.3s;
+}
+.wa-float:hover{transform:scale(1.1);}
+@keyframes waPulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4);}50%{box-shadow:0 4px 35px rgba(37,211,102,0.7);}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(35px);}to{opacity:1;transform:translateY(0);}}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  #story{grid-template-columns:1fr;}
+  .story-canvas-side{height:50vh;position:relative;}
+  .story-text-side{padding:4rem 5%;}
+  #dish-canvas{height:50vh;}
+}
+@media(max-width:640px){
+  .nav-links{display:none;position:absolute;top:100%;left:0;width:100%;background:var(--dark2);flex-direction:column;padding:1.5rem;gap:1.2rem;text-align:center;}
+  .nav-links.open{display:flex;}
+  .menu-toggle{display:block;}
+  .res-form{grid-template-columns:1fr;}
+  .full{grid-column:span 1;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="loader">
+  <div class="loader-content">
+    <div class="loader-logo">Bella Cucina</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <div class="loader-text">Preparing your experience...</div>
+  </div>
+</div>
+
+<button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">
+  <span id="audioIcon">🔇</span>
+</button>
+
+<canvas id="steam-canvas"></canvas>
+
+<a class="wa-float" href="https://wa.me/12125551234?text=Hi!%20I'd%20like%20to%20book%20a%20table." target="_blank">💬</a>
+
+<nav id="navbar">
+  <div class="logo">Bella Cucina</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#story">About</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#reservation">Reserve</a></li>
+  </ul>
+  <button class="menu-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Est. 1985 · Little Italy, New York</div>
+    <h1>Bella<br>Cucina</h1>
+    <p>Authentic Italian Cuisine</p>
+    <div class="hero-btns">
+      <a href="#reservation" class="btn btn-gold">Reserve a Table</a>
+      <a href="#menu" class="btn btn-ghost">Explore Menu</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="story-text-side" id="storyText">
+    <span class="label">Our Heritage</span>
+    <h2>Three generations of passion on every plate</h2>
+    <p>Founded in 1985 by the Rossi family, Bella Cucina has been the beating heart of Italian dining in New York City. Every recipe is a love letter to our homeland — crafted fresh, every single day.</p>
+    <p>Our chefs source only the finest ingredients: San Marzano tomatoes, 24-month aged Parmigiano, and hand-milled Tipo 00 flour. Because great food starts long before it reaches the flame.</p>
+    <div class="stats">
+      <div class="stat"><span>12</span><p>Signature Dishes</p></div>
+      <div class="stat"><span>100+</span><p>Heirloom Recipes</p></div>
+    </div>
+  </div>
+  <div class="story-canvas-side">
+    <canvas id="dish-canvas"></canvas>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="sec-head">
+    <span class="label">What We Serve</span>
+    <h2>Our Menu</h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="menu-tabs">
+    <button class="tab on" onclick="filterMenu(this,'all')">All</button>
+    <button class="tab" onclick="filterMenu(this,'starters')">Starters</button>
+    <button class="tab" onclick="filterMenu(this,'pasta')">Pasta</button>
+    <button class="tab" onclick="filterMenu(this,'mains')">Mains</button>
+    <button class="tab" onclick="filterMenu(this,'desserts')">Desserts</button>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Bruschetta al Pomodoro</h4><span class="price">$12</span></div><p>Grilled sourdough, vine-ripened tomatoes, fresh basil, extra-virgin olive oil</p><span class="mtag">Vegetarian</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Burrata con Prosciutto</h4><span class="price">$18</span></div><p>Creamy burrata, San Daniele prosciutto, arugula, truffle honey drizzle</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Caprese della Casa</h4><span class="price">$16</span></div><p>Buffalo mozzarella, heirloom tomatoes, fresh basil, aged balsamic from Modena</p></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Spaghetti alla Carbonara</h4><span class="price">$24</span></div><p>Hand-rolled spaghetti, guanciale, egg yolk, aged Pecorino Romano, black pepper</p><span class="mtag">Classic</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Tagliatelle al Ragù</h4><span class="price">$26</span></div><p>Handmade egg tagliatelle, slow-braised beef & pork ragù, Parmigiano</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Cacio e Pepe</h4><span class="price">$21</span></div><p>Tonnarelli pasta, Pecorino Romano, Parmigiano Reggiano, cracked black pepper</p><span class="mtag">Vegetarian</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Osso Buco alla Milanese</h4><span class="price">$38</span></div><p>Braised veal shanks, saffron risotto, gremolata, white wine reduction</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Pizza Margherita DOC</h4><span class="price">$20</span></div><p>Neapolitan dough, San Marzano tomato, Fior di latte, fresh basil, wood-fired</p></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Branzino al Forno</h4><span class="price">$34</span></div><p>Whole roasted sea bass, lemon, capers, olives, cherry tomatoes, white wine</p></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Tiramisù Classico</h4><span class="price">$11</span></div><p>Espresso-soaked ladyfingers, mascarpone, dark cocoa — made fresh daily</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Panna Cotta ai Frutti</h4><span class="price">$10</span></div><p>Vanilla bean cream, seasonal berry compote, toasted almonds</p></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Cannoli Siciliani</h4><span class="price">$9</span></div><p>Crispy shell, ricotta cream, candied orange peel, dark chocolate chips</p></div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="exp-item"><div class="exp-icon">🍷</div><h3>Wine Cellar</h3><p>Over 200 Italian labels, personally selected from small-batch producers across Tuscany, Piedmont and Sicily.</p></div>
+  <div class="exp-item"><div class="exp-icon">👨‍🍳</div><h3>Live Kitchen</h3><p>Watch our chefs craft handmade pasta at the open kitchen counter — theatre and taste in one unforgettable experience.</p></div>
+  <div class="exp-item"><div class="exp-icon">🕯️</div><h3>Private Dining</h3><p>Reserve our intimate dining room for up to 20 guests. Perfect for celebrations, proposals, and corporate dinners.</p></div>
+  <div class="exp-item"><div class="exp-icon">🌿</div><h3>Garden Terrace</h3><p>Dine under the stars on our heated outdoor terrace, open year-round with seasonal tasting menus.</p></div>
+</section>
+
+<!-- RESERVATION -->
+<section id="reservation">
+  <div class="res-inner">
+    <span class="label">Book Your Table</span>
+    <h2>Reservations</h2>
+    <div class="gold-line"></div>
+    <form class="res-form" onsubmit="submitRes(event)">
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email Address" required>
+      <input type="tel" placeholder="Phone Number" required>
+      <select required>
+        <option value="" disabled selected>Guests</option>
+        <option>1 Guest</option><option>2 Guests</option><option>3 Guests</option>
+        <option>4 Guests</option><option>5–6 Guests</option><option>7+ (Private Dining)</option>
+      </select>
+      <input type="date" required>
+      <select required>
+        <option value="" disabled selected>Time</option>
+        <option>12:00 PM</option><option>1:00 PM</option><option>6:00 PM</option>
+        <option>7:00 PM</option><option>7:30 PM</option><option>8:00 PM</option>
+        <option>8:30 PM</option><option>9:00 PM</option>
+      </select>
+      <textarea class="full" placeholder="Special requests or occasion..." rows="3"></textarea>
+      <button type="submit" class="btn btn-gold full" id="resBtn" style="font-size:0.75rem;letter-spacing:2px;">Confirm Reservation</button>
+    </form>
+    <p class="wa-note">Or book instantly on <a href="https://wa.me/12125551234" target="_blank">WhatsApp →</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">Bella Cucina</div>
+  <div class="foot-links">
+    <a href="#hero">Home</a>
+    <a href="#story">About</a>
+    <a href="#menu">Menu</a>
+    <a href="#reservation">Reserve</a>
+    <a href="https://instagram.com" target="_blank">Instagram</a>
+    <a href="tel:+12125551234">(212) 555-1234</a>
+  </div>
+  <p>© 2025 Bella Cucina · Little Italy, NYC</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('solid',window.scrollY>60);
+});
+
+// ── MENU FILTER ──
+function filterMenu(btn,cat){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.mcard').forEach(c=>{
+    c.style.display=(cat==='all'||c.dataset.cat===cat)?'block':'none';
+  });
+}
+
+// ── RESERVATION ──
+function submitRes(e){
+  e.preventDefault();
+  const btn=document.getElementById('resBtn');
+  btn.textContent='✓ Reservation Received!';
+  btn.style.background='#2d7a45';
+  setTimeout(()=>{e.target.reset();btn.textContent='Confirm Reservation';btn.style.background='';},4000);
+}
+
+// ── MOBILE NAV ──
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ══════════════════════════════════════
+// THREE.JS — BACKGROUND PARTICLE FIELD
+// ══════════════════════════════════════
+(function(){
+  const canvas=document.getElementById('bg-canvas');
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,200);
+  camera.position.z=30;
+
+  // Floating particles
+  const count=800;
+  const geo=new THREE.BufferGeometry();
+  const pos=new Float32Array(count*3);
+  const sizes=new Float32Array(count);
+  for(let i=0;i<count;i++){
+    pos[i*3]=(Math.random()-0.5)*120;
+    pos[i*3+1]=(Math.random()-0.5)*120;
+    pos[i*3+2]=(Math.random()-0.5)*60;
+    sizes[i]=Math.random()*2+0.5;
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('size',new THREE.BufferAttribute(sizes,1));
+
+  const mat=new THREE.PointsMaterial({
+    color:0xC9A84C,size:0.18,transparent:true,opacity:0.35,
+    blending:THREE.AdditiveBlending,depthWrite:false,
+    sizeAttenuation:true
+  });
+  const particles=new THREE.Points(geo,mat);
+  scene.add(particles);
+
+  // Nebula ring
+  const ringGeo=new THREE.TorusGeometry(18,0.15,8,120);
+  const ringMat=new THREE.MeshBasicMaterial({color:0x8B0000,transparent:true,opacity:0.18,wireframe:true});
+  const ring=new THREE.Mesh(ringGeo,ringMat);
+  ring.rotation.x=Math.PI/3;
+  scene.add(ring);
+
+  const ring2Geo=new THREE.TorusGeometry(12,0.08,6,80);
+  const ring2=new THREE.Mesh(ring2Geo,new THREE.MeshBasicMaterial({color:0xC9A84C,transparent:true,opacity:0.1,wireframe:true}));
+  ring2.rotation.x=Math.PI/4;ring2.rotation.y=Math.PI/6;
+  scene.add(ring2);
+
+  let scrollY=0,targetY=0;
+  window.addEventListener('scroll',()=>{scrollY=window.scrollY;});
+
+  let mx=0,my=0;
+  window.addEventListener('mousemove',e=>{mx=(e.clientX/window.innerWidth-0.5)*2;my=(e.clientY/window.innerHeight-0.5)*2;});
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.008;
+    targetY+=(scrollY*0.012-targetY)*0.05;
+    particles.rotation.y=t*0.05+mx*0.04;
+    particles.rotation.x=targetY*0.002+my*0.03;
+    ring.rotation.z=t*0.03;ring.rotation.y=t*0.02;
+    ring2.rotation.z=-t*0.025;ring2.rotation.x=Math.PI/4+t*0.01;
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+
+// ══════════════════════════════════════
+// THREE.JS — DISH CANVAS (right panel)
+// ══════════════════════════════════════
+(function(){
+  const canvas=document.getElementById('dish-canvas');
+  const parent=canvas.parentElement;
+
+  function W(){return parent.offsetWidth;}
+  function H(){return parent.offsetHeight||window.innerHeight;}
+
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(W(),H());
+  renderer.shadowMap.enabled=true;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(45,W()/H(),0.1,100);
+  camera.position.set(0,6,14);
+  camera.lookAt(0,0,0);
+
+  // Lights
+  const ambient=new THREE.AmbientLight(0xfff0e0,0.5);
+  scene.add(ambient);
+
+  const warm=new THREE.PointLight(0xffc87a,3,30);
+  warm.position.set(6,8,6);
+  scene.add(warm);
+
+  const cool=new THREE.PointLight(0x8B0000,1.5,25);
+  cool.position.set(-8,4,-4);
+  scene.add(cool);
+
+  const rimLight=new THREE.DirectionalLight(0xffffff,0.6);
+  rimLight.position.set(0,10,-8);
+  scene.add(rimLight);
+
+  // ── PLATE ──
+  const plateGroup=new THREE.Group();
+  scene.add(plateGroup);
+
+  // Base plate — wide flat cylinder
+  const plateGeo=new THREE.CylinderGeometry(3.5,3.8,0.22,64);
+  const plateMat=new THREE.MeshStandardMaterial({
+    color:0xfaf8f5,metalness:0.08,roughness:0.1,
+  });
+  const plate=new THREE.Mesh(plateGeo,plateMat);
+  plate.receiveShadow=true;
+  plateGroup.add(plate);
+
+  // Plate rim detail
+  const rimGeo=new THREE.TorusGeometry(3.5,0.12,16,80);
+  const rimMat=new THREE.MeshStandardMaterial({color:0xe8e0d0,metalness:0.1,roughness:0.15});
+  const rim=new THREE.Mesh(rimGeo,rimMat);
+  rim.rotation.x=Math.PI/2;rim.position.y=0.13;
+  plateGroup.add(rim);
+
+  // Gold border ring
+  const goldRimGeo=new THREE.TorusGeometry(3.35,0.04,8,80);
+  const goldRimMat=new THREE.MeshStandardMaterial({color:0xC9A84C,metalness:0.8,roughness:0.15,emissive:0xC9A84C,emissiveIntensity:0.2});
+  const goldRim=new THREE.Mesh(goldRimGeo,goldRimMat);
+  goldRim.rotation.x=Math.PI/2;goldRim.position.y=0.14;
+  plateGroup.add(goldRim);
+
+  // ── PASTA MOUND ──
+  // Base mound
+  const moundGeo=new THREE.SphereGeometry(1.4,32,32,0,Math.PI*2,0,Math.PI*0.55);
+  const moundMat=new THREE.MeshStandardMaterial({color:0xd4963a,roughness:0.6,metalness:0.05});
+  const mound=new THREE.Mesh(moundGeo,moundMat);
+  mound.position.y=0.22;
+  mound.rotation.x=Math.PI;
+  plateGroup.add(mound);
+
+  // Pasta strands — twisted tubes
+  const strandColors=[0xe8a840,0xd08a2a,0xc47a20,0xdaa030];
+  for(let i=0;i<14;i++){
+    const curve=new THREE.CatmullRomCurve3([]);
+    const pts=[];
+    const angle=Math.random()*Math.PI*2;
+    const r=Math.random()*0.9+0.1;
+    for(let j=0;j<8;j++){
+      const a=angle+j*0.35+Math.random()*0.3;
+      const rad=r*(0.6+j*0.06);
+      pts.push(new THREE.Vector3(
+        Math.cos(a)*rad+(Math.random()-0.5)*0.2,
+        0.3+j*0.08+Math.random()*0.1,
+        Math.sin(a)*rad+(Math.random()-0.5)*0.2
+      ));
+    }
+    curve.points=pts;
+    const tubeGeo=new THREE.TubeGeometry(curve,20,0.035+Math.random()*0.03,8,false);
+    const tubeMat=new THREE.MeshStandardMaterial({
+      color:strandColors[i%strandColors.length],roughness:0.5,metalness:0.05
+    });
+    const tube=new THREE.Mesh(tubeGeo,tubeMat);
+    tube.castShadow=true;
+    plateGroup.add(tube);
+  }
+
+  // Sauce pool
+  const sauceGeo=new THREE.CylinderGeometry(1.1,1.2,0.06,40);
+  const sauceMat=new THREE.MeshStandardMaterial({color:0xb03010,roughness:0.7,metalness:0.0});
+  const sauce=new THREE.Mesh(sauceGeo,sauceMat);
+  sauce.position.y=0.28;
+  plateGroup.add(sauce);
+
+  // Basil leaves
+  function addLeaf(x,z,rot){
+    const leafGeo=new THREE.SphereGeometry(0.18,8,6);
+    leafGeo.scale(1,0.2,1.4);
+    const leafMat=new THREE.MeshStandardMaterial({color:0x2d6e20,roughness:0.6,metalness:0.0});
+    const leaf=new THREE.Mesh(leafGeo,leafMat);
+    leaf.position.set(x,0.85,z);
+    leaf.rotation.y=rot;
+    plateGroup.add(leaf);
+  }
+  addLeaf(0.2,0.4,0.3);addLeaf(-0.3,0.1,1.1);addLeaf(0.5,-0.2,2.0);
+
+  // Parmesan shavings
+  for(let i=0;i<6;i++){
+    const shaveGeo=new THREE.BoxGeometry(0.25,0.04,0.12);
+    const shaveMat=new THREE.MeshStandardMaterial({color:0xf5e8b0,roughness:0.4,metalness:0.05});
+    const shave=new THREE.Mesh(shaveGeo,shaveMat);
+    const a=Math.random()*Math.PI*2,r=Math.random()*0.8+0.2;
+    shave.position.set(Math.cos(a)*r,0.9+Math.random()*0.3,Math.sin(a)*r);
+    shave.rotation.set(Math.random(),Math.random()*Math.PI,Math.random());
+    plateGroup.add(shave);
+  }
+
+  // Cherry tomato
+  function addTomato(x,z){
+    const tGeo=new THREE.SphereGeometry(0.22,16,16);
+    const tMat=new THREE.MeshStandardMaterial({color:0xcc2200,roughness:0.3,metalness:0.1,emissive:0x440000});
+    const t=new THREE.Mesh(tGeo,tMat);
+    t.position.set(x,0.82,z);
+    plateGroup.add(t);
+    // stem
+    const stemGeo=new THREE.CylinderGeometry(0.02,0.02,0.14,6);
+    const stemMat=new THREE.MeshStandardMaterial({color:0x2d5a10,roughness:0.8});
+    const stem=new THREE.Mesh(stemGeo,stemMat);
+    stem.position.set(x,1.0,z);
+    plateGroup.add(stem);
+  }
+  addTomato(-0.7,0.6);addTomato(0.8,-0.5);
+
+  // ── FLOATING INGREDIENTS ──
+  const floaters=[];
+  function makeFloater(color,size,x,y,z,speed){
+    const g=new THREE.IcosahedronGeometry(size,0);
+    const m=new THREE.MeshStandardMaterial({color,roughness:0.5,metalness:0.1,transparent:true,opacity:0.7,wireframe:false});
+    const mesh=new THREE.Mesh(g,m);
+    mesh.position.set(x,y,z);
+    scene.add(mesh);
+    floaters.push({mesh,speed,base:{x,y,z},phase:Math.random()*Math.PI*2});
+    return mesh;
+  }
+  makeFloater(0xC9A84C,0.25,-6,2,2,0.7);
+  makeFloater(0x8B0000,0.18,7,3,-1,1.1);
+  makeFloater(0x2d6e20,0.2,-5,-1,-2,0.9);
+  makeFloater(0xf5e8b0,0.15,6,-2,1,1.3);
+  makeFloater(0xcc2200,0.22,5,5,3,0.6);
+  makeFloater(0xC9A84C,0.12,-7,5,-3,1.5);
+  makeFloater(0xffffff,0.1,4,-4,2,1.0);
+
+  // Scroll-driven dish animation
+  let scrollRatio=0,targetRatio=0;
+  const storySection=document.getElementById('story');
+
+  function getScrollRatio(){
+    const rect=storySection.getBoundingClientRect();
+    const total=storySection.offsetHeight-window.innerHeight;
+    return Math.max(0,Math.min(1,-rect.top/total));
+  }
+
+  window.addEventListener('scroll',()=>{
+    targetRatio=getScrollRatio();
+  });
+
+  let t2=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t2+=0.01;
+    scrollRatio+=(targetRatio-scrollRatio)*0.06;
+
+    // Plate: rises and rotates as you scroll
+    plateGroup.rotation.y=t2*0.3+scrollRatio*Math.PI*1.5;
+    plateGroup.position.y=Math.sin(t2*0.5)*0.12+scrollRatio*1.5;
+    plateGroup.rotation.x=-0.15+scrollRatio*0.25;
+
+    // Tilt toward viewer
+    plateGroup.position.z=scrollRatio*1.5;
+
+    // Floaters bob
+    floaters.forEach(f=>{
+      f.mesh.position.y=f.base.y+Math.sin(t2*f.speed+f.phase)*0.6;
+      f.mesh.rotation.x=t2*0.3;
+      f.mesh.rotation.z=t2*0.2;
+      f.mesh.position.x=f.base.x+Math.sin(t2*f.speed*0.5+f.phase)*0.3;
+    });
+
+    // Warm light flicker
+    warm.intensity=2.8+Math.sin(t2*2.3)*0.3;
+
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // Resize
+  window.addEventListener('resize',()=>{
+    renderer.setSize(W(),H());
+    camera.aspect=W()/H();
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ── LOADER ──
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+  },2700);
+});
+
+// ── AUDIO TOGGLE ──
+let audioPlaying=false;
+let audioCtx,oscillator,gainNode,gain2;
+function toggleAudio(){
+  const icon=document.getElementById('audioIcon');
+  if(!audioPlaying){
+    if(!audioCtx){
+      audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      // Subtle ambient drone with Italian flavor
+      oscillator=audioCtx.createOscillator();
+      const osc2=audioCtx.createOscillator();
+      gainNode=audioCtx.createGain();
+      gain2=audioCtx.createGain();
+      oscillator.type='sine';oscillator.frequency.value=110;
+      osc2.type='sine';osc2.frequency.value=165;
+      gainNode.gain.value=0;gain2.gain.value=0;
+      oscillator.connect(gainNode).connect(audioCtx.destination);
+      osc2.connect(gain2).connect(audioCtx.destination);
+      oscillator.start();osc2.start();
+      // Fade in
+      gainNode.gain.linearRampToValueAtTime(0.03,audioCtx.currentTime+1);
+      gain2.gain.linearRampToValueAtTime(0.02,audioCtx.currentTime+1);
+    }else if(audioCtx.state==='suspended'){
+      audioCtx.resume();
+    }
+    icon.textContent='🎵';
+    audioPlaying=true;
+  }else{
+    if(gainNode) gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);
+    if(gain2) gain2.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);
+    icon.textContent='🔇';
+    audioPlaying=false;
+  }
+}
+
+// ── 3D TILT EFFECT ON MENU CARDS ──
+document.querySelectorAll('.mcard').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const rect=card.getBoundingClientRect();
+    const x=(e.clientX-rect.left)/rect.width-0.5;
+    const y=(e.clientY-rect.top)/rect.height-0.5;
+    card.style.transform=`translateY(-5px) rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='translateY(0) rotateY(0) rotateX(0)';
+  });
+});
+
+// ── STEAM PARTICLES FROM PASTA ──
+(function(){
+  const canvas=document.getElementById('steam-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+
+  const particles=[];
+  class Particle{
+    constructor(){
+      this.reset();
+    }
+    reset(){
+      const dishSection=document.getElementById('story');
+      const rect=dishSection.getBoundingClientRect();
+      this.x=rect.left+rect.width*0.65+(Math.random()-0.5)*100;
+      this.y=rect.top+rect.height*0.55;
+      this.vx=(Math.random()-0.5)*0.3;
+      this.vy=-Math.random()*0.8-0.3;
+      this.life=0;
+      this.maxLife=80+Math.random()*60;
+      this.size=Math.random()*40+20;
+      this.opacity=0;
+    }
+    update(){
+      this.life++;
+      this.x+=this.vx+Math.sin(this.life*0.05)*0.5;
+      this.y+=this.vy;
+      this.opacity=Math.sin((this.life/this.maxLife)*Math.PI)*0.15;
+      if(this.life>=this.maxLife) this.reset();
+    }
+    draw(){
+      const grad=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size);
+      grad.addColorStop(0,`rgba(255,240,200,${this.opacity})`);
+      grad.addColorStop(1,'rgba(255,240,200,0)');
+      ctx.fillStyle=grad;
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  for(let i=0;i<25;i++) particles.push(new Particle());
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{p.update();p.draw();});
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener('resize',()=>{
+    canvas.width=window.innerWidth;
+    canvas.height=window.innerHeight;
+  });
+})();
+
+// ── EASTER EGG: KONAMI CODE FOR SPECIAL MENU ──
+let konamiCode=[];
+const konamiSequence=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+document.addEventListener('keydown',e=>{
+  konamiCode.push(e.key);
+  konamiCode=konamiCode.slice(-10);
+  if(konamiCode.join(',')===konamiSequence.join(',')){
+    document.body.style.filter='hue-rotate(180deg)';
+    setTimeout(()=>{document.body.style.filter='';},3000);
+  }
+});
+</script>
+</body>
+</html>
