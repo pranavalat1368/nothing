@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bella Cucina — Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="loader">
+  <div class="loader-content">
+    <div class="loader-logo">Bella Cucina</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+    <div class="loader-text">Preparing the menu...</div>
+  </div>
+</div>
+
+<button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">
+  <span id="audioIcon">🔇</span>
+</button>
+
+<a class="wa-float" href="https://wa.me/9427981710?text=Hello!%20Can%20I%20get%20a%20reservation%20please%3F" target="_blank">💬</a>
+
+<nav id="navbar">
+  <div class="logo">Bella Cucina</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html#hero">Home</a></li>
+    <li><a href="index.html#story">About</a></li>
+    <li><a href="menu.html">Menu</a></li>
+    <li><a href="index.html#reservation">Reserve</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle">☰</button>
+</nav>
+
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Bella Cucina · Menu</div>
+    <h1>Our<br>Menu</h1>
+    <p>Handmade pasta, seasonal plates, and desserts</p>
+    <div class="hero-btns">
+      <a href="#menu" class="btn btn-gold">View Menu</a>
+      <a href="index.html#reservation" class="btn btn-ghost">Reserve</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="sec-head">
+    <span class="label">What We Serve</span>
+    <h2>Our Menu</h2>
+    <div class="gold-line"></div>
+  </div>
+  <div class="menu-tabs">
+    <button class="tab on" data-cat="all">All</button>
+    <button class="tab" data-cat="starters">Starters</button>
+    <button class="tab" data-cat="pasta">Pasta</button>
+    <button class="tab" data-cat="mains">Mains</button>
+    <button class="tab" data-cat="desserts">Desserts</button>
+  </div>
+  <div class="highlight-grid">
+    <article class="highlight-card"><span class="chip">Chef’s Signature</span><h3>House-made Pasta</h3><p>Freshly rolled daily with slow-simmered sauces, hand-finished with Parmigiano and herbs.</p></article>
+    <article class="highlight-card"><span class="chip">Seasonal</span><h3>Market-Fresh Pairings</h3><p>From sun-ripened tomatoes to wild mushrooms, every plate is built around what’s at its best tonight.</p></article>
+    <article class="highlight-card"><span class="chip">Atmosphere</span><h3>Warm Candlelight Dining</h3><p>Soft lighting, velvet tones, and a lively open kitchen make the room feel intimate from the first bite.</p></article>
+    <article class="highlight-card"><span class="chip">Every Wednesday</span><h3>Carbonara Special</h3><p>Our weekly chef special: silky yolk, crispy guanciale, and black pepper over fresh pasta, served only on Wednesday.</p></article>
+  </div>
+  <div class="menu-grid" id="menuGrid">
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Bruschetta al Pomodoro</h4><span class="price">$12</span></div><p>Grilled sourdough, vine-ripened tomatoes, fresh basil, extra-virgin olive oil</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Burrata con Prosciutto</h4><span class="price">$18</span></div><p>Creamy burrata, San Daniele prosciutto, arugula, truffle honey drizzle</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Caprese della Casa</h4><span class="price">$16</span></div><p>Buffalo mozzarella, heirloom tomatoes, fresh basil, aged balsamic from Modena</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Arancini Siciliani</h4><span class="price">$14</span></div><p>Crisp saffron rice balls with mozzarella, peas, and tomato sugo</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="starters"><div class="mcard-top"><h4>Calamari Fritti</h4><span class="price">$17</span></div><p>Lightly fried calamari, lemon aioli, parsley, and charred lemon</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Spaghetti alla Carbonara</h4><span class="price">$24</span></div><p>Hand-rolled spaghetti, guanciale, egg yolk, aged Pecorino Romano, black pepper</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Tagliatelle al Ragù</h4><span class="price">$26</span></div><p>Handmade egg tagliatelle, slow-braised beef & pork ragù, Parmigiano</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Cacio e Pepe</h4><span class="price">$21</span></div><p>Tonnarelli pasta, Pecorino Romano, Parmigiano Reggiano, cracked black pepper</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Rigatoni alla Vodka</h4><span class="price">$23</span></div><p>Al dente rigatoni, tomato cream vodka sauce, basil, and pecorino</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="pasta"><div class="mcard-top"><h4>Orecchiette Pesto Genovese</h4><span class="price">$22</span></div><p>Ear-shaped pasta tossed with basil pesto, pine nuts, and potato</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Osso Buco alla Milanese</h4><span class="price">$38</span></div><p>Braised veal shanks, saffron risotto, gremolata, white wine reduction</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Pizza Margherita DOC</h4><span class="price">$20</span></div><p>Neapolitan dough, San Marzano tomato, Fior di latte, fresh basil, wood-fired</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Branzino al Forno</h4><span class="price">$34</span></div><p>Whole roasted sea bass, lemon, capers, olives, cherry tomatoes, white wine</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Pollo alla Parmigiana</h4><span class="price">$29</span></div><p>Crispy chicken breast, mozzarella, tomato sauce, basil, and spaghetti</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="mains"><div class="mcard-top"><h4>Filetto al Pepe Verde</h4><span class="price">$41</span></div><p>Beef tenderloin, green peppercorn sauce, roasted potatoes, and herbs</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Tiramisù Classico</h4><span class="price">$11</span></div><p>Espresso-soaked ladyfingers, mascarpone, dark cocoa — made fresh daily</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Panna Cotta ai Frutti</h4><span class="price">$10</span></div><p>Vanilla bean cream, seasonal berry compote, toasted almonds</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Cannoli Siciliani</h4><span class="price">$9</span></div><p>Crispy shell, ricotta cream, candied orange peel, dark chocolate chips</p><span class="mtag">Signature</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Gelato Trio</h4><span class="price">$12</span></div><p>Vanilla, pistachio, and chocolate gelato served with biscotti</p><span class="mtag">Chef's Pick</span></div>
+    <div class="mcard" data-cat="desserts"><div class="mcard-top"><h4>Zabaglione al Marsala</h4><span class="price">$13</span></div><p>Silky Marsala custard with almond crumble and fresh strawberries</p><span class="mtag">Signature</span></div>
+  </div>
+</section>
+
+<section id="reservation">
+  <div class="res-inner">
+    <span class="label">Book Your Table</span>
+    <h2>Reserve by WhatsApp or Call</h2>
+    <div class="gold-line"></div>
+    <p class="wa-note" style="max-width:520px;margin:1rem auto 0;line-height:1.8;">Send a WhatsApp message for quick reservation support, or call us directly for immediate booking help.</p>
+    <form class="res-form" id="reservationForm">
+      <input name="name" type="text" placeholder="Your name" required>
+      <input name="phone" type="tel" placeholder="Phone number" required>
+      <input name="email" type="email" placeholder="Email address">
+      <input name="date" type="date" required>
+      <select name="guests" required>
+        <option value="" selected disabled>Guests</option>
+        <option value="1">1 guest</option>
+        <option value="2">2 guests</option>
+        <option value="3">3 guests</option>
+        <option value="4">4 guests</option>
+        <option value="5">5 guests</option>
+        <option value="6">6 guests</option>
+        <option value="7">7 guests</option>
+        <option value="8">8 guests</option>
+      </select>
+      <select name="occasion">
+        <option value="" selected>Occasion (optional)</option>
+        <option value="Birthday">Birthday</option>
+        <option value="Anniversary">Anniversary</option>
+        <option value="Date night">Date night</option>
+        <option value="Business dinner">Business dinner</option>
+        <option value="Celebration">Celebration</option>
+      </select>
+      <textarea class="full" name="notes" rows="4" placeholder="Any special requests or seating preferences?"></textarea>
+      <button type="submit" class="btn btn-gold full">Request Reservation</button>
+    </form>
+    <div class="hero-btns" style="margin-top:2rem;">
+      <a href="https://wa.me/9427981710?text=Hello!%20I%20would%20like%20to%20reserve%20a%20table" class="btn btn-gold" target="_blank">WhatsApp Reservation</a>
+      <a href="tel:+919427981710" class="btn btn-ghost">Call to Reserve</a>
+    </div>
+    <p class="wa-note">WhatsApp: <a href="https://wa.me/9427981710?text=Hello!%20I%20would%20like%20to%20reserve%20a%20table" target="_blank">Open chat</a> · Call: <a href="tel:+919427981710">+91 94279 81710</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-logo">Bella Cucina</div>
+  <div class="foot-links">
+    <a href="index.html#hero">Home</a>
+    <a href="index.html#story">About</a>
+    <a href="menu.html">Menu</a>
+    <a href="index.html#reservation">Reserve</a>
+    <a href="https://instagram.com" target="_blank">Instagram</a>
+    <a href="tel:+919427981710">Call Us</a>
+  </div>
+  <p>© 2025 Bella Cucina · Little Italy, NYC</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
