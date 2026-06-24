@@ -1,12 +1,75 @@
 import os
+import json
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
+from sqlalchemy import create_engine, Column, String, Integer, DateTime, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 app = Flask(__name__, static_folder='.', static_url_path='/')
 
-# Simple in-memory storage
-reservations = []
+# Database Setup
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    # Fallback for local development
+    DATABASE_URL = 'sqlite:///bella_cucina.db'
 
+# Handle Render's postgres:// to postgresql://
+if DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
+Session = scoped_session(sessionmaker(bind=engine))
+Base = declarative_base()
+
+# Database Models
+class Reservation(Base):
+    __tablename__ = 'reservations'
+    
+    id = Column(String, primary_key=True)
+    name = Column(String(100), nullable=False)
+    phone = Column(String(20), nullable=False)
+    email = Column(String(100), default='')
+    date = Column(String(20), nullable=False)
+    time = Column(String(10), nullable=False)
+    guests = Column(Integer, nullable=False)
+    occasion = Column(String(200), default='')
+    notes = Column(Text, default='')
+    status = Column(String(20), default='pending')
+    created_at = Column(DateTime, default=datetime.now)
+
+class MenuItem(Base):
+    __tablename__ = 'menu_items'
+    
+    id = Column(String, primary_key=True)
+    name = Column(String(100), nullable=False)
+    category = Column(String(50), nullable=False)
+    price = Column(String(10), nullable=False)
+    description = Column(Text, default='')
+
+class User(Base):
+    __tablename__ = 'users'
+    
+    id = Column(String, primary_key=True)
+    email = Column(String(100), unique=True, nullable=False)
+    name = Column(String(100), nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+
+class Order(Base):
+    __tablename__ = 'orders'
+    
+    id = Column(String, primary_key=True)
+    reservation_id = Column(String, nullable=True)
+    items = Column(Text, nullable=False)  # JSON string
+    status = Column(String(20), default='pending')
+    total_price = Column(String(10), default='0')
+    created_at = Column(DateTime, default=datetime.now)
+
+# Create all tables
+Base.metadata.create_all(engine)
+
+# Routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -15,45 +78,187 @@ def index():
 def menu():
     return render_template('menu.html')
 
-@app.route('/api/reserve', methods=['POST'])
+@app.route('/admin')
+def admin_dashboard():
+    return render_template('admin.html')
+
+@app.route('/api/menu', methods=['GET'])
+def get_menu():
+    try:
+        session = Session()
+        items = session.query(MenuItem).all()
+        
+        # Group by category
+        menu_data = {"categories": set(), "items": []}
+        for item in items:
+            menu_data["categories"].add(item.category)
+            menu_data["items"].append({
+                'id': item.id,
+                'name': item.name,
+                'category': item.category,
+                'price': item.price,
+                'description': item.description
+            })
+        
+        menu_data["categories"] = list(menu_data["categories"])
+        session.close()
+        
+        return jsonify(menu_data), 200
+    except Exception as e:
+        print(f"Error fetching menu: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reservations', methods=['POST'])
 def reserve_table():
     try:
         data = request.json
+        session = Session()
         
-        if not all(key in data for key in ['name', 'email', 'date', 'time', 'guests']):
+        # Mandatory validation checks
+        required_fields = ['name', 'phone', 'date', 'time', 'guests']
+        if not all(key in data and str(data[key]).strip() for key in required_fields):
+            session.close()
             return jsonify({'success': False, 'message': 'Missing required fields'}), 400
         
-        reservation = {
-            'id': len(reservations) + 1,
-            'name': data['name'],
-            'email': data['email'],
-            'date': data['date'],
-            'time': data['time'],
-            'guests': data['guests'],
-            'created_at': datetime.now().isoformat()
-        }
+        # Create new reservation
+        reservation = Reservation(
+            id=f"res_{int(datetime.now().timestamp() * 1000)}",
+            name=data['name'],
+            phone=data['phone'],
+            email=data.get('email', ''),
+            date=data['date'],
+            time=data['time'],
+            guests=int(data['guests']),
+            occasion=data.get('occasion', ''),
+            notes=data.get('notes', ''),
+            status='pending'
+        )
         
-        reservations.append(reservation)
+        session.add(reservation)
+        session.commit()
+        session.close()
         
         return jsonify({
             'success': True,
             'message': 'Reservation confirmed!',
-            'reservation_id': reservation['id']
+            'reservation': {
+                'id': reservation.id,
+                'name': reservation.name,
+                'phone': reservation.phone,
+                'email': reservation.email,
+                'date': reservation.date,
+                'time': reservation.time,
+                'guests': reservation.guests,
+                'occasion': reservation.occasion,
+                'notes': reservation.notes,
+                'status': reservation.status,
+                'createdAt': reservation.created_at.isoformat()
+            }
         }), 201
     
     except Exception as e:
+        print(f"Error creating reservation: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/reservations', methods=['GET'])
 def get_reservations():
-    return jsonify(reservations), 200
+    try:
+        session = Session()
+        reservations = session.query(Reservation).all()
+        
+        result = [{
+            'id': res.id,
+            'name': res.name,
+            'phone': res.phone,
+            'email': res.email,
+            'date': res.date,
+            'time': res.time,
+            'guests': res.guests,
+            'occasion': res.occasion,
+            'notes': res.notes,
+            'status': res.status,
+            'createdAt': res.created_at.isoformat()
+        } for res in reservations]
+        
+        session.close()
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error fetching reservations: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
-@app.route('/api/reservations/<int:reservation_id>', methods=['GET'])
+@app.route('/api/reservations/<reservation_id>', methods=['GET'])
 def get_reservation(reservation_id):
-    for res in reservations:
-        if res['id'] == reservation_id:
-            return jsonify(res), 200
-    return jsonify({'success': False, 'message': 'Reservation not found'}), 404
+    try:
+        session = Session()
+        res = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+        
+        if not res:
+            session.close()
+            return jsonify({'success': False, 'message': 'Reservation not found'}), 404
+        
+        result = {
+            'id': res.id,
+            'name': res.name,
+            'phone': res.phone,
+            'email': res.email,
+            'date': res.date,
+            'time': res.time,
+            'guests': res.guests,
+            'occasion': res.occasion,
+            'notes': res.notes,
+            'status': res.status,
+            'createdAt': res.created_at.isoformat()
+        }
+        
+        session.close()
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error fetching reservation: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reservations/<reservation_id>', methods=['PATCH'])
+def update_reservation(reservation_id):
+    try:
+        data = request.json
+        status = data.get('status')
+        
+        if not status or status not in ['pending', 'confirmed', 'cancelled']:
+            return jsonify({'success': False, 'message': 'Invalid status'}), 400
+        
+        session = Session()
+        res = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+        
+        if not res:
+            session.close()
+            return jsonify({'success': False, 'message': 'Reservation not found'}), 404
+        
+        res.status = status
+        session.commit()
+        session.close()
+        
+        return jsonify({'success': True, 'message': f'Reservation status updated to {status}'}), 200
+    except Exception as e:
+        print(f"Error updating reservation: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/reservations/<reservation_id>', methods=['DELETE'])
+def delete_reservation(reservation_id):
+    try:
+        session = Session()
+        res = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+        
+        if not res:
+            session.close()
+            return jsonify({'success': False, 'message': 'Reservation not found'}), 404
+        
+        session.delete(res)
+        session.commit()
+        session.close()
+        
+        return jsonify({'success': True, 'message': 'Reservation deleted successfully'}), 200
+    except Exception as e:
+        print(f"Error deleting reservation: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/health', methods=['GET'])
 def health():

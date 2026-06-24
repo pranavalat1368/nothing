@@ -5,5 +5,186 @@
     "mains",
     "desserts"
   ],
-  "items": []
+  "items": [
+    {
+      "id": "starter_1",
+      "name": "Bruschetta al Pomodoro",
+      "category": "starters",
+      "price": "$12",
+      "description": "Grilled sourdough, vine-ripened tomatoes, fresh basil, extra-virgin olive oil",
+      "tag": "Signature",
+      "dietary": ["Vegetarian", "Vegan Option"]
+    },
+    {
+      "id": "starter_2",
+      "name": "Burrata con Prosciutto",
+      "category": "starters",
+      "price": "$18",
+      "description": "Creamy burrata, San Daniele prosciutto, arugula, truffle honey drizzle",
+      "tag": "Chef's Pick",
+      "dietary": ["Gluten-Free Option"]
+    },
+    {
+      "id": "starter_3",
+      "name": "Caprese della Casa",
+      "category": "starters",
+      "price": "$16",
+      "description": "Buffalo mozzarella, heirloom tomatoes, fresh basil, aged balsamic from Modena",
+      "tag": "Signature",
+      "dietary": ["Vegetarian", "Gluten-Free"]
+    },
+    {
+      "id": "starter_4",
+      "name": "Arancini Siciliani",
+      "category": "starters",
+      "price": "$14",
+      "description": "Crisp saffron rice balls with mozzarella, peas, and tomato sugo",
+      "tag": "Chef's Pick",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "starter_5",
+      "name": "Calamari Fritti",
+      "category": "starters",
+      "price": "$17",
+      "description": "Lightly fried calamari, lemon aioli, parsley, and charred lemon",
+      "tag": "Signature",
+      "dietary": []
+    },
+    {
+      "id": "pasta_1",
+      "name": "Spaghetti alla Carbonara",
+      "category": "pasta",
+      "price": "$24",
+      "description": "Hand-rolled spaghetti, guanciale, egg yolk, aged Pecorino Romano, black pepper",
+      "tag": "Signature",
+      "dietary": []
+    },
+    {
+      "id": "pasta_2",
+      "name": "Tagliatelle al Ragù",
+      "category": "pasta",
+      "price": "$26",
+      "description": "Handmade egg tagliatelle, slow-braised beef & pork ragù, Parmigiano",
+      "tag": "Chef's Pick",
+      "dietary": []
+    },
+    {
+      "id": "pasta_3",
+      "name": "Cacio e Pepe",
+      "category": "pasta",
+      "price": "$21",
+      "description": "Tonnarelli pasta, Pecorino Romano, Parmigiano Reggiano, cracked black pepper",
+      "tag": "Signature",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "pasta_4",
+      "name": "Rigatoni alla Vodka",
+      "category": "pasta",
+      "price": "$23",
+      "description": "Al dente rigatoni, tomato cream vodka sauce, basil, and pecorino",
+      "tag": "Chef's Pick",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "pasta_5",
+      "name": "Orecchiette Pesto Genovese",
+      "category": "pasta",
+      "price": "$22",
+      "description": "Ear-shaped pasta tossed with basil pesto, pine nuts, and potato",
+      "tag": "Signature",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "main_1",
+      "name": "Osso Buco alla Milanese",
+      "category": "mains",
+      "price": "$38",
+      "description": "Braised veal shanks, saffron risotto, gremolata, white wine reduction",
+      "tag": "Signature",
+      "dietary": ["Gluten-Free"]
+    },
+    {
+      "id": "main_2",
+      "name": "Pizza Margherita DOC",
+      "category": "mains",
+      "price": "$20",
+      "description": "Neapolitan dough, San Marzano tomato, Fior di latte, fresh basil, wood-fired",
+      "tag": "Chef's Pick",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "main_3",
+      "name": "Branzino al Forno",
+      "category": "mains",
+      "price": "$34",
+      "description": "Whole roasted sea bass, lemon, capers, olives, cherry tomatoes, white wine",
+      "tag": "Chef's Pick",
+      "dietary": ["Gluten-Free"]
+    },
+    {
+      "id": "main_4",
+      "name": "Pollo alla Parmigiana",
+      "category": "mains",
+      "price": "$29",
+      "description": "Crispy chicken breast, mozzarella, tomato sauce, basil, and spaghetti",
+      "tag": "Signature",
+      "dietary": []
+    },
+    {
+      "id": "main_5",
+      "name": "Filetto al Pepe Verde",
+      "category": "mains",
+      "price": "$41",
+      "description": "Beef tenderloin, green peppercorn sauce, roasted potatoes, and herbs",
+      "tag": "Chef's Pick",
+      "dietary": ["Gluten-Free"]
+    },
+    {
+      "id": "dessert_1",
+      "name": "Tiramisù Classico",
+      "category": "desserts",
+      "price": "$11",
+      "description": "Espresso-soaked ladyfingers, mascarpone, dark cocoa — made fresh daily",
+      "tag": "Signature",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "dessert_2",
+      "name": "Panna Cotta ai Frutti",
+      "category": "desserts",
+      "price": "$10",
+      "description": "Vanilla bean cream, seasonal berry compote, toasted almonds",
+      "tag": "Chef's Pick",
+      "dietary": ["Vegetarian", "Gluten-Free"]
+    },
+    {
+      "id": "dessert_3",
+      "name": "Cannoli Siciliani",
+      "category": "desserts",
+      "price": "$9",
+      "description": "Crispy shell, ricotta cream, candied orange peel, dark chocolate chips",
+      "tag": "Signature",
+      "dietary": ["Vegetarian"]
+    },
+    {
+      "id": "dessert_4",
+      "name": "Gelato Trio",
+      "category": "desserts",
+      "price": "$12",
+      "description": "Vanilla, pistachio, and chocolate gelato served with biscotti",
+      "tag": "Chef's Pick",
+      "dietary": ["Vegetarian", "Gluten-Free Option"]
+    },
+    {
+      "id": "dessert_5",
+      "name": "Zabaglione al Marsala",
+      "category": "desserts",
+      "price": "$13",
+      "description": "Silky Marsala custard with almond crumble and fresh strawberries",
+      "tag": "Signature",
+      "dietary": ["Vegetarian", "Gluten-Free"]
+    }
+  ]
 }

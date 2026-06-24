@@ -1,32 +1,128 @@
 // ── NAV SCROLL ──
 window.addEventListener('scroll',()=>{
-  document.getElementById('navbar').classList.toggle('solid',window.scrollY>60);
+  const navbar = document.getElementById('navbar');
+  if(navbar) navbar.classList.toggle('solid',window.scrollY>60);
 });
 
 const apiBase=window.location.origin==='null'?'http://localhost:3000':window.location.origin;
 
-// ── MENU FILTER ──
-function filterMenu(btn,cat){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.querySelectorAll('.mcard').forEach(c=>{
-    c.style.display=(cat==='all'||c.dataset.cat===cat)?'block':'none';
+// ── MENU LOADING, RENDERING & FILTERING ──
+let menuItems = [];
+let activeCategory = 'all';
+let searchQuery = '';
+
+async function initDynamicMenu() {
+  const menuGrid = document.getElementById('menuGrid');
+  if (!menuGrid) return; // Only run on pages that have the menu grid
+
+  const menuSearch = document.getElementById('menuSearch');
+
+  try {
+    const response = await fetch(`${apiBase}/api/menu`);
+    if (!response.ok) throw new Error('Failed to load menu data');
+    const data = await response.json();
+    menuItems = data.items || [];
+    renderMenuItems();
+
+    if (menuSearch) {
+      menuSearch.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderMenuItems();
+      });
+    }
+
+    // Set up tabs dynamically
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeCategory = btn.dataset.cat;
+        renderMenuItems();
+      });
+    });
+  } catch (error) {
+    console.error('Menu load error:', error);
+    menuGrid.innerHTML = `<p class="empty-state" style="grid-column: span 3; text-align: center; color: var(--muted); padding: 3rem 0; font-style: italic;">Unable to load the menu. Please check your connection.</p>`;
+  }
+}
+
+function renderMenuItems() {
+  const menuGrid = document.getElementById('menuGrid');
+  if (!menuGrid) return;
+
+  // Filter items
+  const filtered = menuItems.filter(item => {
+    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+    const matchesSearch = !searchQuery || 
+      item.name.toLowerCase().includes(searchQuery) ||
+      item.description.toLowerCase().includes(searchQuery) ||
+      (item.tag && item.tag.toLowerCase().includes(searchQuery)) ||
+      (item.dietary && item.dietary.some(d => d.toLowerCase().includes(searchQuery)));
+    return matchesCategory && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    menuGrid.innerHTML = `<p class="empty-state" style="grid-column: span 3; text-align: center; color: var(--muted); padding: 4rem 0; font-style: italic;">No dishes match your criteria.</p>`;
+    return;
+  }
+
+  menuGrid.innerHTML = filtered.map(item => {
+    const tagsHtml = [];
+    if (item.tag) {
+      tagsHtml.push(`<span class="mtag">${item.tag}</span>`);
+    }
+    if (item.dietary && item.dietary.length) {
+      tagsHtml.push(`<span class="mtag dietary-tag" style="border-color:rgba(46, 204, 113, 0.35); color:#2ecc71;">${item.dietary.join(', ')}</span>`);
+    }
+    
+    return `
+      <div class="mcard" data-cat="${item.category}">
+        <div class="mcard-top">
+          <h4>${item.name}</h4>
+          <span class="price">${item.price}</span>
+        </div>
+        <p>${item.description}</p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.3rem;">
+          ${tagsHtml.join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Re-attach 3D Tilt hover effect
+  attachTiltEffect();
+}
+
+function attachTiltEffect() {
+  document.querySelectorAll('.mcard').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `translateY(-5px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0) rotateY(0) rotateX(0)';
+    });
   });
 }
 
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click',()=>filterMenu(btn,btn.dataset.cat));
-});
+// Initialize Menu
+document.addEventListener('DOMContentLoaded', initDynamicMenu);
 
 // ── MOBILE NAV ──
 const menuToggle=document.getElementById('menuToggle');
 if(menuToggle){
   menuToggle.addEventListener('click',()=>{
-    document.getElementById('navLinks').classList.toggle('open');
+    const navLinks = document.getElementById('navLinks');
+    if(navLinks) navLinks.classList.toggle('open');
   });
 }
 document.querySelectorAll('.nav-links a').forEach(a=>{
-  a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open'));
+  a.addEventListener('click',()=>{
+    const navLinks = document.getElementById('navLinks');
+    if(navLinks) navLinks.classList.remove('open');
+  });
 });
 
 function ensureReservationPopup(){
@@ -70,6 +166,8 @@ function openReservationPopup(title,message){
 // ══════════════════════════════════════
 (function(){
   const canvas=document.getElementById('bg-canvas');
+  if (!canvas) return; // Prevent errors on pages without canvas
+  
   const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.setSize(window.innerWidth,window.innerHeight);
@@ -138,9 +236,12 @@ function openReservationPopup(title,message){
 
 // ── LOADER ──
 window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    document.getElementById('loader').classList.add('hidden');
-  },2700);
+  const loader = document.getElementById('loader');
+  if(loader) {
+    setTimeout(()=>{
+      loader.classList.add('hidden');
+    },2700);
+  }
 });
 
 // ── AUDIO TOGGLE ──
@@ -148,6 +249,8 @@ let audioPlaying=false;
 let audioCtx,oscillator,gainNode,gain2;
 function toggleAudio(){
   const icon=document.getElementById('audioIcon');
+  if(!icon) return;
+
   if(!audioPlaying){
     if(!audioCtx){
       audioCtx=new(window.AudioContext||window.webkitAudioContext)();
@@ -215,19 +318,6 @@ if(reservationForm){
     }
   });
 }
-
-// ── 3D TILT EFFECT ON MENU CARDS ──
-document.querySelectorAll('.mcard').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const rect=card.getBoundingClientRect();
-    const x=(e.clientX-rect.left)/rect.width-0.5;
-    const y=(e.clientY-rect.top)/rect.height-0.5;
-    card.style.transform=`translateY(-5px) rotateY(${x*8}deg) rotateX(${-y*8}deg)`;
-  });
-  card.addEventListener('mouseleave',()=>{
-    card.style.transform='translateY(0) rotateY(0) rotateX(0)';
-  });
-});
 
 // ── EASTER EGG: KONAMI CODE FOR SPECIAL MENU ──
 let konamiCode=[];

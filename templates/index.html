@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bella Cucina — 3D Experience</title>
+<title>Bella Chaos — 3D Experience</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +13,7 @@
 
 <div id="loader">
   <div class="loader-content">
-    <div class="loader-logo">Bella Cucina</div>
+    <div class="loader-logo">Bella Chaos</div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
     <div class="loader-text">Preparing your experience...</div>
   </div>
@@ -26,7 +26,7 @@
 <a class="wa-float" href="https://wa.me/9427981710?text=Hello!%20Can%20I%20get%20a%20reservation%20please%3F" target="_blank">💬</a>
 
 <nav id="navbar">
-  <div class="logo">Bella Cucina</div>
+  <div class="logo">Bella Chaos</div>
   <ul class="nav-links" id="navLinks">
     <li><a href="#hero">Home</a></li>
     <li><a href="#story">About</a></li>
@@ -40,7 +40,7 @@
 <section id="hero">
   <div class="hero-inner">
     <div class="hero-tag">Est. 1985 · Little Italy, New York</div>
-    <h1>Bella<br>Cucina</h1>
+    <h1>Bella<br>Chaos</h1>
     <p>Authentic Italian Cuisine</p>
     <div class="hero-btns">
       <a href="https://wa.me/9427981710?text=Hello!%20I%20would%20like%20to%20reserve%20a%20table" class="btn btn-gold" target="_blank">WhatsApp Reservation</a>
@@ -58,9 +58,9 @@
   <div class="story-text-side" id="storyText">
     <span class="label">Our Heritage</span>
     <h2>Three generations of passion on every plate</h2>
-    <p>Founded in 1985 by the Rossi family, Bella Cucina has been the beating heart of Italian dining in New York City. Every recipe is a love letter to our homeland — crafted fresh, every single day.</p>
+    <p>Founded in 1985 by the Rossi family, Bella Chaos has been the beating heart of Italian dining in New York City. Every recipe is a love letter to our homeland — crafted fresh, every single day.</p>
     <p>Our chefs source only the finest ingredients: San Marzano tomatoes, 24-month aged Parmigiano, and hand-milled Tipo 00 flour. Because great food starts long before it reaches the flame.</p>
-    <div class="story-note">A warm neighborhood dining room, a lively open kitchen, and a menu that changes with the season — that is the Bella Cucina rhythm.</div>
+    <div class="story-note">A warm neighborhood dining room, a lively open kitchen, and a menu that changes with the season — that is the Bella Chaos rhythm.</div>
     <div class="stats">
       <div class="stat"><span>38+</span><p>Years Open</p></div>
       <div class="stat"><span>4.9★</span><p>Google Rating</p></div>
@@ -92,8 +92,22 @@
     <form class="res-form" id="reservationForm">
       <input name="name" type="text" placeholder="Your name" required>
       <input name="phone" type="tel" placeholder="Phone number" required>
-      <input name="email" type="email" placeholder="Email address">
+      <input class="full" name="email" type="email" placeholder="Email address">
       <input name="date" type="date" required>
+      <select name="time" required>
+        <option value="" selected disabled>Time</option>
+        <option value="17:00">5:00 PM</option>
+        <option value="17:30">5:30 PM</option>
+        <option value="18:00">6:00 PM</option>
+        <option value="18:30">6:30 PM</option>
+        <option value="19:00">7:00 PM</option>
+        <option value="19:30">7:30 PM</option>
+        <option value="20:00">8:00 PM</option>
+        <option value="20:30">8:30 PM</option>
+        <option value="21:00">9:00 PM</option>
+        <option value="21:30">9:30 PM</option>
+        <option value="22:00">10:00 PM</option>
+      </select>
       <select name="guests" required>
         <option value="" selected disabled>Guests</option>
         <option value="1">1 guest</option>
@@ -125,7 +139,7 @@
 </section>
 
 <footer>
-  <div class="foot-logo">Bella Cucina</div>
+  <div class="foot-logo">Bella Chaos</div>
   <div class="foot-links">
     <a href="#hero">Home</a>
     <a href="#story">About</a>
@@ -134,7 +148,7 @@
     <a href="https://instagram.com" target="_blank">Instagram</a>
     <a href="tel:+919427981710">Call Us</a>
   </div>
-  <p>© 2025 Bella Cucina · Little Italy, NYC</p>
+  <p>© 2025 Bella Chaos · Little Italy, NYC</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

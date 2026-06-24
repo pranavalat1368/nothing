@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bella Cucina — Menu</title>
+<title>Bella Chaos — Menu</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +13,7 @@
 
 <div id="loader">
   <div class="loader-content">
-    <div class="loader-logo">Bella Cucina</div>
+    <div class="loader-logo">Bella Chaos</div>
     <div class="loader-bar"><div class="loader-fill"></div></div>
     <div class="loader-text">Preparing the menu...</div>
   </div>
@@ -26,7 +26,7 @@
 <a class="wa-float" href="https://wa.me/9427981710?text=Hello!%20Can%20I%20get%20a%20reservation%20please%3F" target="_blank">💬</a>
 
 <nav id="navbar">
-  <div class="logo">Bella Cucina</div>
+  <div class="logo">Bella Chaos</div>
   <ul class="nav-links" id="navLinks">
     <li><a href="index.html#hero">Home</a></li>
     <li><a href="index.html#story">About</a></li>
@@ -38,7 +38,7 @@
 
 <section id="hero">
   <div class="hero-inner">
-    <div class="hero-tag">Bella Cucina · Menu</div>
+    <div class="hero-tag">Bella Chaos · Menu</div>
     <h1>Our<br>Menu</h1>
     <p>Handmade pasta, seasonal plates, and desserts</p>
     <div class="hero-btns">
@@ -57,6 +57,9 @@
     <span class="label">What We Serve</span>
     <h2>Our Menu</h2>
     <div class="gold-line"></div>
+  </div>
+  <div class="menu-search-container">
+    <input type="text" id="menuSearch" placeholder="Search dishes (e.g. Carbonara, Gluten-Free, Vegan)..." autocomplete="off">
   </div>
   <div class="menu-tabs">
     <button class="tab on" data-cat="all">All</button>
@@ -104,8 +107,22 @@
     <form class="res-form" id="reservationForm">
       <input name="name" type="text" placeholder="Your name" required>
       <input name="phone" type="tel" placeholder="Phone number" required>
-      <input name="email" type="email" placeholder="Email address">
+      <input class="full" name="email" type="email" placeholder="Email address">
       <input name="date" type="date" required>
+      <select name="time" required>
+        <option value="" selected disabled>Time</option>
+        <option value="17:00">5:00 PM</option>
+        <option value="17:30">5:30 PM</option>
+        <option value="18:00">6:00 PM</option>
+        <option value="18:30">6:30 PM</option>
+        <option value="19:00">7:00 PM</option>
+        <option value="19:30">7:30 PM</option>
+        <option value="20:00">8:00 PM</option>
+        <option value="20:30">8:30 PM</option>
+        <option value="21:00">9:00 PM</option>
+        <option value="21:30">9:30 PM</option>
+        <option value="22:00">10:00 PM</option>
+      </select>
       <select name="guests" required>
         <option value="" selected disabled>Guests</option>
         <option value="1">1 guest</option>
@@ -137,7 +154,7 @@
 </section>
 
 <footer>
-  <div class="foot-logo">Bella Cucina</div>
+  <div class="foot-logo">Bella Chaos</div>
   <div class="foot-links">
     <a href="index.html#hero">Home</a>
     <a href="index.html#story">About</a>
@@ -146,7 +163,7 @@
     <a href="https://instagram.com" target="_blank">Instagram</a>
     <a href="tel:+919427981710">Call Us</a>
   </div>
-  <p>© 2025 Bella Cucina · Little Italy, NYC</p>
+  <p>© 2025 Bella Chaos · Little Italy, NYC</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
