@@ -3,13 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bella Chaos — 3D Experience</title>
+<meta name="description" content="Bella Chaos — Authentic Italian cuisine in Little Italy, NYC. Handmade pasta, seasonal plates, and an unforgettable dining experience since 1985.">
+<title>Bella Chaos — Authentic Italian Fine Dining, NYC</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
+
+<!-- Floating Menu CTA -->
+<a href="/menu" id="floatingMenuBtn" style="
+  position:fixed;top:50%;right:-80px;transform:translateY(-50%) rotate(90deg);
+  z-index:150;background:linear-gradient(135deg,#C9A84C,#E8C97A);
+  color:#07050a;font-family:'Jost',sans-serif;font-size:0.62rem;font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;text-decoration:none;
+  padding:0.55rem 1.4rem;border-radius:999px 999px 0 0;
+  box-shadow:0 4px 20px rgba(201,168,76,0.35);
+  transition:right 0.4s cubic-bezier(0.25,0.8,0.25,1), box-shadow 0.3s;
+">Explore Menu</a>
 
 <div id="loader">
   <div class="loader-content">
@@ -61,10 +73,10 @@
     <p>Founded in 1985 by the Rossi family, Bella Chaos has been the beating heart of Italian dining in New York City. Every recipe is a love letter to our homeland — crafted fresh, every single day.</p>
     <p>Our chefs source only the finest ingredients: San Marzano tomatoes, 24-month aged Parmigiano, and hand-milled Tipo 00 flour. Because great food starts long before it reaches the flame.</p>
     <div class="story-note">A warm neighborhood dining room, a lively open kitchen, and a menu that changes with the season — that is the Bella Chaos rhythm.</div>
-    <div class="stats">
-      <div class="stat"><span>38+</span><p>Years Open</p></div>
+  <div class="stats" id="statsRow">
+      <div class="stat"><span data-target="38">0</span><span>+</span><p>Years Open</p></div>
       <div class="stat"><span>4.9★</span><p>Google Rating</p></div>
-      <div class="stat"><span>12</span><p>Signature Dishes</p></div>
+      <div class="stat"><span data-target="12">0</span><p>Signature Dishes</p></div>
     </div>
     <div class="story-highlights">
       <div class="story-highlight"><h4>Family Recipe Book</h4><p>Generations of sauces, pastas, and slow-cooked comfort dishes.</p></div>
@@ -153,5 +165,43 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="script.js"></script>
+<script>
+  // Show floating menu button after scrolling past hero
+  const floatingBtn = document.getElementById('floatingMenuBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > window.innerHeight * 0.6) {
+      floatingBtn.style.right = '0px';
+    } else {
+      floatingBtn.style.right = '-80px';
+    }
+  });
+
+  // Animated stat counters
+  function animateCounter(el, target, duration = 1800) {
+    let start = 0;
+    const step = (timestamp) => {
+      if (!start) start = timestamp;
+      const progress = Math.min((timestamp - start) / duration, 1);
+      el.textContent = Math.floor(progress * target);
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(step);
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('[data-target]').forEach(el => {
+          animateCounter(el, parseInt(el.dataset.target));
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const statsRow = document.getElementById('statsRow');
+  if (statsRow) observer.observe(statsRow);
+</script>
 </body>
 </html>
