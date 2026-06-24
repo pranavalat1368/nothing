@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 from datetime import datetime
 from sqlalchemy import create_engine, Column, String, Integer, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -46,6 +46,8 @@ class MenuItem(Base):
     category = Column(String(50), nullable=False)
     price = Column(String(10), nullable=False)
     description = Column(Text, default='')
+    tag = Column(String(50), default='')
+    dietary = Column(Text, default='[]')
 
 class User(Base):
     __tablename__ = 'users'
@@ -69,14 +71,62 @@ class Order(Base):
 # Create all tables
 Base.metadata.create_all(engine)
 
+# Seed database if empty or schema has changed
+def seed_database():
+    session = Session()
+    try:
+        try:
+            # Check if columns are accessible
+            session.query(MenuItem).first()
+        except Exception:
+            session.rollback()
+            # If query fails (e.g. missing columns), drop and recreate only the menu_items table
+            print("Schema mismatch in menu_items table, recreating it...")
+            MenuItem.__table__.drop(engine, checkfirst=True)
+            MenuItem.__table__.create(engine)
+            
+        if session.query(MenuItem).count() == 0:
+            menu_json_path = os.path.join(os.path.dirname(__file__), 'data', 'menu.json')
+            if os.path.exists(menu_json_path):
+                with open(menu_json_path, 'r') as f:
+                    data = json.load(f)
+                    for item in data.get('items', []):
+                        menu_item = MenuItem(
+                            id=item['id'],
+                            name=item['name'],
+                            category=item['category'],
+                            price=item['price'],
+                            description=item.get('description', ''),
+                            tag=item.get('tag', ''),
+                            dietary=json.dumps(item.get('dietary', []))
+                        )
+                        session.add(menu_item)
+                session.commit()
+                print("Database seeded successfully with menu items.")
+    except Exception as e:
+        print(f"Error seeding database: {e}")
+        session.rollback()
+    finally:
+        session.close()
+
+seed_database()
+
 # Routes
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/index.html')
+def index_html_redirect():
+    return redirect('/')
+
 @app.route('/menu')
 def menu():
     return render_template('menu.html')
+
+@app.route('/menu.html')
+def menu_html_redirect():
+    return redirect('/menu')
 
 @app.route('/admin')
 def admin_dashboard():
@@ -92,12 +142,23 @@ def get_menu():
         menu_data = {"categories": set(), "items": []}
         for item in items:
             menu_data["categories"].add(item.category)
+            
+            # Parse dietary if stored as JSON list
+            dietary_list = []
+            if item.dietary:
+                try:
+                    dietary_list = json.loads(item.dietary)
+                except Exception:
+                    dietary_list = [d.strip() for d in item.dietary.split(',') if d.strip()]
+                    
             menu_data["items"].append({
                 'id': item.id,
                 'name': item.name,
                 'category': item.category,
                 'price': item.price,
-                'description': item.description
+                'description': item.description,
+                'tag': item.tag,
+                'dietary': dietary_list
             })
         
         menu_data["categories"] = list(menu_data["categories"])
@@ -274,4 +335,4 @@ def server_error(error):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=True)
